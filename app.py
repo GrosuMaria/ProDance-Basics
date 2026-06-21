@@ -1,7 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session, Response
 from dance_data import dansuri
 from database import initializare, inregistrare, login, get_progres, salveaza_progres, salveaza_sesiune, get_istoric
-from camera import genereaza_frames
+try:
+    from camera import genereaza_frames
+    CAMERA_DISPONIBILA = True
+except:
+    CAMERA_DISPONIBILA = False
 
 app = Flask(__name__)
 app.secret_key = "danceapp2024"
@@ -95,6 +99,8 @@ def camera():
 @app.route("/video_feed")
 @app.route("/video_feed/<dans_context>")
 def video_feed(dans_context=None):
+    if not CAMERA_DISPONIBILA:
+        return "Camera nu este disponibila", 503
     return Response(
         genereaza_frames(dans_context),
         mimetype='multipart/x-mixed-replace; boundary=frame'
