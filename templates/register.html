@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inregistrare - Dance App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .register-page {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+        }
+
+        /* STANGA */
+        .register-left {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-left-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('/static/images/latino1.jpeg');
+            background-size: cover;
+            background-position: center 30%;
+            filter: brightness(0.4);
+            transform: scale(1.05);
+            transition: transform 8s ease;
+        }
+
+        .register-left-bg.zoomed { transform: scale(1.0); }
+
+        .register-left-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(10,10,20,0.4) 0%,
+                rgba(201,168,76,0.06) 100%
+            );
+        }
+
+        .register-left-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px;
+        }
+
+        .register-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: #c9a84c;
+            letter-spacing: 4px;
+            opacity: 0;
+            animation: fadeInDown 0.8s ease 0.3s forwards;
+        }
+
+        .register-hero-text {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.6s forwards;
+        }
+
+        .register-hero-text h2 {
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+            color: #f5f0e8;
+            line-height: 1.25;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .register-hero-text h2 span { color: #c9a84c; }
+
+        .register-hero-text p {
+            color: rgba(245,240,232,0.7);
+            font-size: 1rem;
+            line-height: 1.8;
+            max-width: 400px;
+            font-weight: 300;
+        }
+
+        .register-steps {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.9s forwards;
+        }
+
+        .register-steps h4 {
+            font-size: 11px;
+            letter-spacing: 4px;
+            color: #c9a84c;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .step-nr {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(201,168,76,0.15);
+            border: 1px solid rgba(201,168,76,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 13px;
+            color: #c9a84c;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: rgba(245,240,232,0.65);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* DREAPTA */
+        .register-right {
+            background: #0a0a14;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-right::before {
+            content: '';
+            position: absolute;
+            top: -200px; right: -200px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .register-form-container {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.4s forwards;
+        }
+
+        .register-form-header { margin-bottom: 28px; }
+
+        .register-form-header .badge {
+            display: inline-block;
+            border: 1px solid rgba(201,168,76,0.4);
+            color: #c9a84c;
+            font-size: 11px;
+            letter-spacing: 3px;
+            padding: 5px 16px;
+            border-radius: 20px;
+            margin-bottom: 14px;
+        }
+
+        .register-form-header h2 {
+            font-size: 2rem;
+            color: #f5f0e8;
+            margin-bottom: 6px;
+        }
+
+        .register-form-header p {
+            color: rgba(245,240,232,0.45);
+            font-size: 0.9rem;
+        }
+
+        /* Selectare caracter */
+        .caracter-section {
+            margin-bottom: 20px;
+        }
+
+        .caracter-label {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: rgba(245,240,232,0.45);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .caracter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .caracter-card {
+            position: relative;
+            border: 2px solid rgba(201,168,76,0.15);
+            border-radius: 14px;
+            padding: 20px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .caracter-card:hover {
+            border-color: rgba(201,168,76,0.4);
+            background: rgba(201,168,76,0.04);
+        }
+
+        .caracter-card.selectat {
+            border-color: #c9a84c;
+            background: rgba(201,168,76,0.08);
+        }
+
+        .caracter-card input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .caracter-emoji {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .caracter-name {
+            font-size: 14px;
+            color: rgba(245,240,232,0.7);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .caracter-card.selectat .caracter-name { color: #c9a84c; }
+
+        .checkmark {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #c9a84c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #0a0a14;
+            font-weight: 700;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+
+        .caracter-card.selectat .checkmark {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Campuri formular */
+        .form-group { margin-bottom: 16px; }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: rgba(245,240,232,0.45);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(201,168,76,0.18);
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: #f5f0e8;
+            font-family: 'Raleway', sans-serif;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #c9a84c;
+            background: rgba(201,168,76,0.04);
+            box-shadow: 0 0 20px rgba(201,168,76,0.08);
+        }
+
+        .form-input::placeholder { color: rgba(245,240,232,0.2); }
+
+        .btn-register {
+            width: 100%;
+            background: #c9a84c;
+            color: #0a0a14;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(201,168,76,0.25);
+        }
+
+        .btn-register:hover {
+            background: #e8c96d;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(201,168,76,0.4);
+        }
+
+        .register-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .register-divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(201,168,76,0.12);
+        }
+
+        .register-divider span {
+            color: rgba(245,240,232,0.25);
+            font-size: 11px;
+            letter-spacing: 2px;
+        }
+
+        .register-login-link {
+            text-align: center;
+            color: rgba(245,240,232,0.45);
+            font-size: 14px;
+        }
+
+        .register-login-link a {
+            color: #c9a84c;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .register-login-link a:hover { color: #e8c96d; }
+
+        .error-box {
+            background: rgba(255,107,107,0.08);
+            border: 1px solid rgba(255,107,107,0.25);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        /* Particule */
+        .particle {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: #c9a84c;
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatUp var(--d) ease-in infinite;
+            animation-delay: var(--dl);
+        }
+
+        @keyframes floatUp {
+            0% { opacity:0; transform: translateY(0); }
+            20% { opacity:0.6; }
+            100% { opacity:0; transform: translateY(-120px); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity:0; transform: translateY(-20px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity:0; transform: translateY(20px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .register-page { grid-template-columns: 1fr; }
+            .register-left { display: none; }
+            .register-right { padding: 32px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-page">
+
+    <!-- STANGA -->
+    <div class="register-left">
+        <div class="register-left-bg" id="registerBg"></div>
+        <div class="register-left-overlay"></div>
+
+        <div class="particle" style="left:20%;top:75%;--d:4s;--dl:0s;"></div>
+        <div class="particle" style="left:40%;top:85%;--d:3.5s;--dl:1s;"></div>
+        <div class="particle" style="left:60%;top:80%;--d:5s;--dl:0.5s;"></div>
+        <div class="particle" style="left:75%;top:70%;--d:4.5s;--dl:1.5s;"></div>
+        <div class="particle" style="left:30%;top:90%;--d:3s;--dl:2s;"></div>
+
+        <div class="register-left-content">
+            <div class="register-logo">&#10022; Dance App &#10022;</div>
+
+            <div class="register-hero-text">
+                <h2>
+                    Primul pas<br>
+                    catre <span>dans</span><br>
+                    incepe aici.
+                </h2>
+                <p>
+                    Creeaza-ti contul gratuit si incepe sa
+                    inveti Cha-Cha-Cha, Jive, Vals Lent si
+                    Quickstep de la zero, pas cu pas.
+                </p>
+            </div>
+
+            <div class="register-steps">
+                <h4>Cum functioneaza</h4>
+                <div class="step">
+                    <div class="step-nr">1</div>
+                    <div class="step-text">
+                        Creeaza contul tau gratuit in 30 de secunde
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-nr">2</div>
+                    <div class="step-text">
+                        Alege stilul de dans si nivelul tau
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-nr">3</div>
+                    <div class="step-text">
+                        Urmareste videoclipul si exerseaza in fata camerei
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-nr">4</div>
+                    <div class="step-text">
+                        Monitorizeaza progresul si urca nivelurile
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DREAPTA -->
+    <div class="register-right">
+        <div class="register-form-container">
+
+            <div class="register-form-header">
+                <div class="badge">&#10022; CONT NOU</div>
+                <h2>Inregistreaza-te</h2>
+                <p>Gratuit, rapid si fara complicatii</p>
+            </div>
+
+            {% if eroare %}
+                <div class="error-box">&#9888; {{ eroare }}</div>
+            {% endif %}
+
+            <form action="/inregistrare" method="POST">
+
+                <div class="caracter-section">
+                    <span class="caracter-label">Alege caracterul tau</span>
+                    <div class="caracter-grid">
+                        <label class="caracter-card" id="card-fata">
+                            <input type="radio" name="character"
+                                   value="fata" required>
+                            <div class="checkmark">&#10003;</div>
+                            <span class="caracter-emoji">&#9792;</span>
+                            <span class="caracter-name">Fata</span>
+                        </label>
+                        <label class="caracter-card" id="card-baiat">
+                            <input type="radio" name="character"
+                                   value="baiat">
+                            <div class="checkmark">&#10003;</div>
+                            <span class="caracter-emoji">&#9794;</span>
+                            <span class="caracter-name">Baiat</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nume utilizator</label>
+                    <input type="text" name="username"
+                           placeholder="Alege un username unic..."
+                           class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Parola</label>
+                    <input type="password" name="parola"
+                           placeholder="Minim 6 caractere..."
+                           class="form-input" required>
+                </div>
+
+                <button type="submit" class="btn-register">
+                    Creeaza cont gratuit &#8594;
+                </button>
+
+            </form>
+
+            <div class="register-divider">
+                <div class="register-divider-line"></div>
+                <span>SAU</span>
+                <div class="register-divider-line"></div>
+            </div>
+
+            <div class="register-login-link">
+                Ai deja cont?
+                <a href="/">Autentifica-te</a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    setTimeout(() => {
+        document.getElementById('registerBg').classList.add('zoomed');
+    }, 100);
+
+    document.querySelectorAll('.caracter-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.caracter-card')
+                    .forEach(c => c.classList.remove('selectat'));
+            this.classList.add('selectat');
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progresul meu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .progress-page {
+            min-height: 100vh;
+            background: #0a0a14;
+            padding-bottom: 60px;
+        }
+
+        /* HEADER */
+        .progress-header {
+            position: relative;
+            padding: 60px 24px 80px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .progress-header::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(
+                ellipse,
+                rgba(201,168,76,0.12) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+
+        .progress-header .badge {
+            display: inline-block;
+            border: 1px solid rgba(201,168,76,0.4);
+            color: #c9a84c;
+            font-size: 11px;
+            letter-spacing: 4px;
+            padding: 5px 20px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        .progress-header h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: #f5f0e8;
+            margin-bottom: 8px;
+        }
+
+        .progress-header h1 span {
+            color: #c9a84c;
+        }
+
+        .progress-header p {
+            color: rgba(245,240,232,0.5);
+            font-size: 1rem;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(245,240,232,0.5);
+            font-size: 14px;
+            transition: color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover { color: #c9a84c; }
+
+        /* SUMAR TOTAL */
+        .sumar-total {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0 24px 48px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .sumar-card {
+            flex: 1;
+            min-width: 150px;
+            background: rgba(201,168,76,0.06);
+            border: 1px solid rgba(201,168,76,0.2);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .sumar-card:hover {
+            border-color: #c9a84c;
+            background: rgba(201,168,76,0.1);
+            transform: translateY(-4px);
+        }
+
+        .sumar-nr {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #c9a84c;
+            font-weight: 700;
+            line-height: 1;
+            display: block;
+        }
+
+        .sumar-label {
+            font-size: 11px;
+            color: rgba(245,240,232,0.5);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 8px;
+            display: block;
+        }
+
+        /* CARDURI DANS */
+        .dansuri-progress {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .dans-progress-card {
+            background: #12121f;
+            border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .dans-progress-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dans-progress-card:hover {
+            border-color: #c9a84c;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3),
+                        0 0 30px rgba(201,168,76,0.08);
+        }
+
+        .dans-progress-img {
+            height: 160px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dans-progress-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 30%;
+            filter: brightness(0.6);
+            transition: transform 0.5s ease;
+        }
+
+        .dans-progress-card:hover .dans-progress-img img {
+            transform: scale(1.05);
+        }
+
+        .dans-progress-img-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                transparent 30%,
+                #12121f 100%
+            );
+        }
+
+        .dans-progress-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(10,10,20,0.8);
+            border: 1px solid rgba(201,168,76,0.4);
+            color: #c9a84c;
+            font-size: 10px;
+            letter-spacing: 2px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .dans-progress-trophy {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 1.8rem;
+            filter: drop-shadow(0 0 8px rgba(201,168,76,0.8));
+            animation: trophyGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes trophyGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(201,168,76,0.8)); }
+            50% { filter: drop-shadow(0 0 20px rgba(201,168,76,1)); }
+        }
+
+        .dans-progress-body {
+            padding: 20px;
+        }
+
+        .dans-progress-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .dans-progress-top h3 {
+            font-size: 1.4rem;
+            color: #f5f0e8;
+        }
+
+        .dans-progress-procent {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: #c9a84c;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        /* Grafic circular */
+        .circle-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .circle-svg {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: rgba(201,168,76,0.1);
+            stroke-width: 6;
+        }
+
+        .circle-fill {
+            fill: none;
+            stroke: #c9a84c;
+            stroke-width: 6;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .circle-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            fill: #c9a84c;
+            font-weight: 700;
+        }
+
+        .dans-progress-info {
+            flex: 1;
+        }
+
+        .dans-progress-info p {
+            color: rgba(245,240,232,0.5);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .dans-progress-info strong {
+            color: #f5f0e8;
+        }
+
+        /* Bara de progres */
+        .bara-container {
+            margin-bottom: 8px;
+        }
+
+        .bara-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(245,240,232,0.4);
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .bara-bg {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .bara-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #c9a84c, #e8c96d);
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        /* Mesaj motivational */
+        .mesaj-motivational {
+            margin-top: 12px;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border-left: 3px solid #c9a84c;
+            background: rgba(201,168,76,0.05);
+            color: rgba(245,240,232,0.6);
+            font-style: italic;
+        }
+
+        .mesaj-motivational.complet {
+            border-color: #4CAF50;
+            background: rgba(76,175,80,0.05);
+            color: rgba(76,175,80,0.8);
+        }
+
+        /* Buton continua */
+        .btn-continua {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: transparent;
+            border: 1px solid rgba(201,168,76,0.3);
+            color: #c9a84c;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-continua:hover {
+            background: #c9a84c;
+            color: #0a0a14;
+            border-color: #c9a84c;
+        }
+
+        /* Niveluri */
+        .niveluri {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .nivel-dot {
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.08);
+            transition: background 0.5s ease;
+        }
+
+        .nivel-dot.activ {
+            background: #c9a84c;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .dansuri-progress { grid-template-columns: 1fr; }
+            .sumar-total { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-page">
+
+    <div class="progress-header">
+        <a href="/home" class="back-btn">&#8592; Inapoi</a>
+        <div class="badge">&#9670; TABLOUL TAU DE BORD</div>
+        <h1>Progresul tau, <span>{{ username }}</span>!</h1>
+        <p>Fiecare miscare finalizata te aduce mai aproape de perfectiune</p>
+    </div>
+
+    <!-- SUMAR -->
+    {% set total_miscari = rezultate.values()|sum(attribute='total') %}
+    {% set total_finalizate = rezultate.values()|sum(attribute='finalizate') %}
+    {% set procent_total = ((total_finalizate / total_miscari) * 100)|int if total_miscari > 0 else 0 %}
+
+    <div class="sumar-total">
+        <div class="sumar-card">
+            <span class="sumar-nr" id="nr-finalizate">0</span>
+            <span class="sumar-label">Miscari finalizate</span>
+        </div>
+        <div class="sumar-card">
+            <span class="sumar-nr">{{ total_miscari }}</span>
+            <span class="sumar-label">Total miscari</span>
+        </div>
+        <div class="sumar-card">
+            <span class="sumar-nr" id="nr-procent">0%</span>
+            <span class="sumar-label">Progres total</span>
+        </div>
+        <div class="sumar-card">
+            <span class="sumar-nr">4</span>
+            <span class="sumar-label">Stiluri disponibile</span>
+        </div>
+    </div>
+
+    <!-- CARDURI DANSURI -->
+    <div class="dansuri-progress">
+        {% set imagini = {
+            'chacha': 'latino1.jpeg',
+            'jive': 'latino2.jpeg',
+            'vals': 'standard1.jpeg',
+            'quickstep': 'standard2.jpeg'
+        } %}
+
+        {% for nume_dans, date in rezultate.items() %}
+        {% set procent = ((date.finalizate / date.total) * 100)|int if date.total > 0 else 0 %}
+        {% set circumferinta = 188 %}
+        {% set offset = circumferinta - (circumferinta * procent / 100) %}
+
+        <div class="dans-progress-card" data-finalizate="{{ date.finalizate }}"
+             data-total="{{ date.total }}" data-procent="{{ procent }}">
+
+            <div class="dans-progress-img">
+                <img src="{{ url_for('static', filename='images/' + imagini[nume_dans]) }}"
+                     alt="{{ date.nume }}">
+                <div class="dans-progress-img-overlay"></div>
+                <span class="dans-progress-badge">{{ date.categorie }}</span>
+                {% if procent == 100 %}
+                    <span class="dans-progress-trophy">&#127942;</span>
+                {% elif procent >= 50 %}
+                    <span class="dans-progress-trophy">&#11088;</span>
+                {% endif %}
+            </div>
+
+            <div class="dans-progress-body">
+                <div class="dans-progress-top">
+                    <h3>{{ date.nume }}</h3>
+                </div>
+
+                <div class="circle-container">
+                    <svg class="circle-svg" viewBox="0 0 70 70">
+                        <circle class="circle-bg" cx="35" cy="35" r="30"/>
+                        <circle class="circle-fill"
+                                cx="35" cy="35" r="30"
+                                stroke-dasharray="{{ circumferinta }}"
+                                stroke-dashoffset="{{ circumferinta }}"
+                                data-offset="{{ offset }}"/>
+                        <text class="circle-text" x="35" y="40"
+                              text-anchor="middle">{{ procent }}%</text>
+                    </svg>
+
+                    <div class="dans-progress-info">
+                        <p>
+                            <strong>{{ date.finalizate }}</strong>
+                            din
+                            <strong>{{ date.total }}</strong>
+                            miscari finalizate
+                        </p>
+
+                        <div class="bara-container">
+                            <div class="bara-label">
+                                <span>Progres</span>
+                                <span>{{ procent }}%</span>
+                            </div>
+                            <div class="bara-bg">
+                                <div class="bara-fill"
+                                     data-width="{{ procent }}%">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="niveluri">
+                            {% for i in range(date.total) %}
+                                <div class="nivel-dot {% if i < date.finalizate %}activ{% endif %}">
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if procent == 100 %}
+                    <div class="mesaj-motivational complet">
+                        &#127942; Felicitari! Ai stapanit complet acest dans!
+                    </div>
+                {% elif procent >= 66 %}
+                    <div class="mesaj-motivational">
+                        &#9654; Esti aproape! Inca putin si termini {{ date.nume }}!
+                    </div>
+                {% elif procent >= 33 %}
+                    <div class="mesaj-motivational">
+                        &#128170; Progres bun! Continua sa exersezi!
+                    </div>
+                {% elif procent > 0 %}
+                    <div class="mesaj-motivational">
+                        &#10022; Ai facut primul pas! Bravo!
+                    </div>
+                {% else %}
+                    <div class="mesaj-motivational">
+                        &#9670; Gata sa incepi {{ date.nume }}?
+                    </div>
+                {% endif %}
+
+                <a href="/dans/{{ nume_dans }}" class="btn-continua">
+                    {% if procent == 100 %}
+                        &#9670; Repeta dansul
+                    {% elif procent > 0 %}
+                        &#9654; Continua →
+                    {% else %}
+                        &#9654; Incepe acum →
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<script>
+// Animatie numere sumar
+function animateCounter(el, target, suffix) {
+    let current = 0;
+    const step = target / 40;
+    const timer = setInterval(() => {
+        current += step;
+        if (current >= target) {
+            el.textContent = target + (suffix || '');
+            clearInterval(timer);
+        } else {
+            el.textContent = Math.floor(current) + (suffix || '');
+        }
+    }, 40);
+}
+
+// Animatie bare si cercuri la scroll
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+
+            // Animeaza bara
+            const bara = entry.target.querySelector('.bara-fill');
+            if (bara) {
+                setTimeout(() => {
+                    bara.style.width = bara.dataset.width;
+                }, 200);
+            }
+
+            // Animeaza cercul
+            const circle = entry.target.querySelector('.circle-fill');
+            if (circle) {
+                setTimeout(() => {
+                    circle.style.strokeDashoffset = circle.dataset.offset;
+                }, 200);
+            }
+
+            // Animeaza punctele nivel
+            const dots = entry.target.querySelectorAll('.nivel-dot.activ');
+            dots.forEach((dot, i) => {
+                dot.style.background = 'rgba(201,168,76,0)';
+                setTimeout(() => {
+                    dot.style.transition = `background 0.3s ease ${i * 0.15}s`;
+                    dot.style.background = '#c9a84c';
+                }, 400);
+            });
+        }
+    });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.dans-progress-card')
+        .forEach(card => observer.observe(card));
+
+// Animatie numere sumar
+window.addEventListener('load', () => {
+    const nrFinalizate = {{ total_finalizate }};
+    const nrProcent = {{ procent_total }};
+
+    setTimeout(() => {
+        animateCounter(
+            document.getElementById('nr-finalizate'),
+            nrFinalizate, ''
+        );
+        animateCounter(
+            document.getElementById('nr-procent'),
+            nrProcent, '%'
+        );
+    }, 300);
+});
+</script>
+
+</body>
+</html>

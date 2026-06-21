@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ dans.nume }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .dans-page { min-height: 100vh; background: #0a0a14; padding-bottom: 60px; }
+
+        .top-progress {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(10,10,20,0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(201,168,76,0.15);
+            padding: 12px 24px; display: flex; align-items: center; gap: 16px;
+        }
+        .top-progress-back {
+            color: rgba(245,240,232,0.5); font-size: 20px;
+            transition: color 0.3s; text-decoration: none; flex-shrink: 0;
+        }
+        .top-progress-back:hover { color: #c9a84c; }
+        .top-progress-info { flex: 1; }
+        .top-progress-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem; color: #f5f0e8; margin-bottom: 4px;
+        }
+        .top-progress-bar-bg {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px; height: 5px; width: 100%;
+        }
+        .top-progress-bar-fill {
+            height: 100%; border-radius: 20px;
+            background: linear-gradient(90deg, #c9a84c, #e8c96d);
+        }
+        .top-progress-count {
+            font-size: 13px; color: #c9a84c; font-weight: 600;
+            flex-shrink: 0; font-family: 'Playfair Display', serif;
+        }
+
+        .dans-header {
+            position: relative; height: 300px;
+            overflow: hidden; margin-top: 57px;
+        }
+        .dans-header-bg {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center 30%;
+            filter: brightness(0.35);
+        }
+        .dans-header-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, transparent 30%, #0a0a14 100%);
+        }
+        .dans-header-content {
+            position: relative; z-index: 2; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 32px;
+            max-width: 900px; margin: 0 auto;
+        }
+        .dans-header-badge {
+            display: inline-block;
+            border: 1px solid rgba(201,168,76,0.5);
+            color: #c9a84c; font-size: 11px; letter-spacing: 3px;
+            padding: 4px 14px; border-radius: 20px;
+            margin-bottom: 12px; width: fit-content;
+        }
+        .dans-header-content h1 {
+            font-size: 2.8rem; color: #f5f0e8; margin-bottom: 10px;
+        }
+        .dans-header-content p {
+            color: rgba(245,240,232,0.6); font-size: 1rem; max-width: 500px;
+        }
+
+        .dans-content { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
+        .nivel-header {
+            display: flex; align-items: center; gap: 16px;
+            margin-bottom: 24px; margin-top: 40px;
+        }
+        .nivel-header:first-child { margin-top: 0; }
+        .nivel-linie { flex: 1; height: 1px; background: rgba(201,168,76,0.2); }
+        .nivel-titlu {
+            color: #c9a84c; font-size: 12px; letter-spacing: 4px;
+            text-transform: uppercase; font-weight: 600; white-space: nowrap;
+        }
+
+        .miscare-card {
+            background: #12121f;
+            border: 1px solid rgba(201,168,76,0.12);
+            border-radius: 20px; overflow: hidden; margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .miscare-card:hover { border-color: rgba(201,168,76,0.3); }
+        .miscare-card.finalizata {
+            border-color: rgba(201,168,76,0.4);
+            background: linear-gradient(135deg, #12121f 0%, rgba(201,168,76,0.04) 100%);
+        }
+
+        .miscare-header {
+            display: flex; align-items: center;
+            padding: 20px 24px 16px; gap: 16px;
+        }
+        .miscare-nr {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(201,168,76,0.1);
+            border: 1px solid rgba(201,168,76,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 14px; color: #c9a84c; font-weight: 700; flex-shrink: 0;
+        }
+        .miscare-nr.finalizat-nr {
+            background: rgba(201,168,76,0.2); border-color: #c9a84c;
+        }
+        .miscare-titlu-grup { flex: 1; }
+        .miscare-titlu-grup h3 { font-size: 1.2rem; color: #f5f0e8; margin-bottom: 4px; }
+        .miscare-titlu-grup p { color: rgba(245,240,232,0.5); font-size: 0.875rem; }
+        .finalizat-badge {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(201,168,76,0.12);
+            border: 1px solid rgba(201,168,76,0.3);
+            color: #c9a84c; font-size: 12px; font-weight: 600;
+            padding: 6px 14px; border-radius: 20px;
+            letter-spacing: 1px; white-space: nowrap;
+        }
+
+        .video-container { padding: 0 24px 16px; }
+        .video-wrapper { border-radius: 12px; overflow: hidden; background: #000; }
+        .video-wrapper iframe { width: 100%; height: 260px; display: block; border: none; }
+
+        .camera-section { display: none; padding: 0 24px 16px; }
+        .camera-section.activa { display: block; }
+        .camera-label {
+            display: flex; align-items: center; gap: 8px;
+            color: #c9a84c; font-size: 13px; font-weight: 600;
+            letter-spacing: 2px; margin-bottom: 12px;
+        }
+        .camera-dot {
+            width: 8px; height: 8px; background: #c9a84c;
+            border-radius: 50%; animation: blink 1s infinite;
+        }
+        .camera-img { width: 100%; border-radius: 12px; border: 1px solid rgba(201,168,76,0.3); }
+
+        .actiuni { padding: 0 24px 24px; display: flex; gap: 12px; }
+        .btn-incepe {
+            flex: 1; background: #c9a84c; color: #0a0a14; border: none;
+            border-radius: 12px; padding: 14px 24px;
+            font-family: 'Raleway', sans-serif; font-size: 15px;
+            font-weight: 700; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-incepe:hover { background: #e8c96d; transform: translateY(-2px); }
+        .btn-finalizeaza {
+            flex: 1; background: transparent; border: 1px solid #c9a84c;
+            color: #c9a84c; border-radius: 12px; padding: 14px 24px;
+            font-family: 'Raleway', sans-serif; font-size: 15px;
+            font-weight: 600; cursor: pointer; transition: all 0.3s; width: 100%;
+        }
+        .btn-finalizeaza:hover { background: #c9a84c; color: #0a0a14; }
+
+        .confetti-container {
+            position: fixed; inset: 0; pointer-events: none;
+            z-index: 999; display: none;
+        }
+        .confetti-container.activ { display: block; }
+        .confetti-piece {
+            position: absolute; opacity: 0; top: -10px;
+            animation: confettiFall 2s ease-in forwards;
+        }
+
+        .succes-overlay {
+            position: fixed; inset: 0; z-index: 998;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(10,10,20,0.85);
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .succes-overlay.activ { opacity: 1; pointer-events: auto; }
+        .succes-box {
+            background: #12121f; border: 1px solid #c9a84c;
+            border-radius: 24px; padding: 40px; text-align: center; max-width: 360px;
+            animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+        }
+        .succes-icon { font-size: 4rem; display: block; margin-bottom: 16px; }
+        .succes-box h3 { font-size: 1.8rem; color: #c9a84c; margin-bottom: 8px; }
+        .succes-box p { color: rgba(245,240,232,0.6); margin-bottom: 24px; line-height: 1.6; }
+        .succes-btn {
+            background: #c9a84c; color: #0a0a14; border: none;
+            border-radius: 12px; padding: 12px 32px;
+            font-family: 'Raleway', sans-serif; font-size: 15px;
+            font-weight: 700; cursor: pointer; transition: all 0.3s;
+        }
+        .succes-btn:hover { background: #e8c96d; }
+
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+        @keyframes confettiFall {
+            0% { opacity:1; transform: translateY(0) rotate(0deg); }
+            100% { opacity:0; transform: translateY(100vh) rotate(720deg); }
+        }
+        @keyframes popIn {
+            from { transform: scale(0.7); opacity:0; }
+            to { transform: scale(1); opacity:1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="confetti-container" id="confetti"></div>
+
+<div class="succes-overlay" id="succesOverlay">
+    <div class="succes-box">
+        <span class="succes-icon">&#127942;</span>
+        <h3>Bravo!</h3>
+        <p id="succesText">Ai finalizat aceasta miscare!</p>
+        <button class="succes-btn" onclick="inchideSucces()">Continua &#8594;</button>
+    </div>
+</div>
+
+{% set total = dans.miscari|length %}
+{% set finalizate_count = namespace(val=0) %}
+{% for m in dans.miscari %}
+    {% if progres.get(m.id) == 1 %}
+        {% set finalizate_count.val = finalizate_count.val + 1 %}
+    {% endif %}
+{% endfor %}
+{% set procent_top = ((finalizate_count.val / total) * 100)|int if total > 0 else 0 %}
+
+<div class="top-progress">
+    <a href="/home" class="top-progress-back">&#8592;</a>
+    <div class="top-progress-info">
+        <div class="top-progress-title">{{ dans.nume }}</div>
+        <div class="top-progress-bar-bg">
+            <div class="top-progress-bar-fill" style="width: {{ procent_top }}%;"></div>
+        </div>
+    </div>
+    <div class="top-progress-count">{{ finalizate_count.val }}/{{ total }}</div>
+</div>
+
+{% set imagini = {'chacha': 'latino1.jpeg', 'jive': 'latino2.jpeg', 'vals': 'standard1.jpeg', 'quickstep': 'standard2.jpeg'} %}
+
+<div class="dans-header">
+    <div class="dans-header-bg"
+         style="background-image: url('{{ url_for('static', filename='images/' + imagini.get(dans_nume, 'hero.jpeg')) }}');">
+    </div>
+    <div class="dans-header-overlay"></div>
+    <div class="dans-header-content">
+        <span class="dans-header-badge">{{ dans.categorie }}</span>
+        <h1>{{ dans.nume }}</h1>
+        <p>{{ dans.descriere }}</p>
+    </div>
+</div>
+
+<div class="dans-content">
+    {% set nr = namespace(val=0) %}
+    {% for nivel, eticheta, emoji in [(1, 'Incepator', '🥉'), (2, 'Intermediar', '🥈'), (3, 'Avansat', '🥇')] %}
+        {% set are_miscari = namespace(val=false) %}
+        {% for m in dans.miscari %}
+            {% if m.nivel == nivel %}{% set are_miscari.val = true %}{% endif %}
+        {% endfor %}
+
+        {% if are_miscari.val %}
+        <div class="nivel-header">
+            <span class="nivel-linie"></span>
+            <span class="nivel-titlu">{{ emoji }} Nivel {{ nivel }} &mdash; {{ eticheta }}</span>
+            <span class="nivel-linie"></span>
+        </div>
+
+        {% for miscare in dans.miscari %}
+        {% if miscare.nivel == nivel %}
+        {% set nr.val = nr.val + 1 %}
+        {% set este_finalizata = progres.get(miscare.id) == 1 %}
+
+        <div class="miscare-card {% if este_finalizata %}finalizata{% endif %}">
+            <div class="miscare-header">
+                <div class="miscare-nr {% if este_finalizata %}finalizat-nr{% endif %}">
+                    {% if este_finalizata %}&#10003;{% else %}{{ nr.val }}{% endif %}
+                </div>
+                <div class="miscare-titlu-grup">
+                    <h3>{{ miscare.nume }}</h3>
+                    <p>{{ miscare.descriere }}</p>
+                </div>
+                {% if este_finalizata %}
+                    <div class="finalizat-badge">&#10022; Finalizat</div>
+                {% endif %}
+            </div>
+
+            {% if not este_finalizata %}
+            <div class="video-container" id="video-{{ miscare.id }}">
+                <div class="video-wrapper">
+                    <iframe src="{{ miscare.video }}" title="{{ miscare.nume }}" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="actiuni" id="actiuni-{{ miscare.id }}">
+                <button class="btn-incepe" onclick="incepe({{ miscare.id }})">
+                    &#9654; Incepe miscarea
+                </button>
+            </div>
+
+            <div class="camera-section" id="camera-{{ miscare.id }}">
+                <div class="camera-label">
+                    <div class="camera-dot"></div>
+                    CAMERA ACTIVA
+                </div>
+                <img id="feed-{{ miscare.id }}" 
+                   class="camera-img" 
+                   alt="Camera"
+                   style="width:100%; border-radius:12px; 
+                   border:1px solid rgba(201,168,76,0.3);
+                   display:block; min-height:200px;
+                   background:#12121f;">
+                <div id="feedback-box-{{ miscare.id }}"
+                     style="margin-top:12px; padding:14px;
+                      background:rgba(255,255,255,0.03);
+                     border-radius:10px; min-height:60px;
+                     transition: all 0.3s ease;">
+                 <div style="color:rgba(245,240,232,0.3);
+                font-size:13px; text-align:center;">
+        &#9432; Analiza miscarea...
+    </div>
+</div>
+                <div class="actiuni" style="padding: 12px 0 0;">
+                    <form action="/finalizeaza/{{ dans_nume }}/{{ miscare.id }}" method="POST" style="flex:1;"
+                          onsubmit="arataSucees('{{ miscare.nume }}')">
+                        <button type="submit" class="btn-finalizeaza">
+                            &#10003; Am executat miscarea corect!
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+function incepe(id) {
+    document.getElementById('video-' + id).style.display = 'none';
+    document.getElementById('actiuni-' + id).style.display = 'none';
+    var cam = document.getElementById('camera-' + id);
+    cam.classList.add('activa');
+    var feed = document.getElementById('feed-' + id);
+    feed.src = '/video_feed/' + dansContext;
+    startFeedback(id);
+}
+
+function startFeedback(miscareId) {
+    setInterval(function() {
+        fetch('/feedback/' + dansContext)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                afiseazaFeedback(data, miscareId);
+            })
+            .catch(function() {});
+    }, 2000);
+}
+
+function afiseazaFeedback(data, miscareId) {
+    var box = document.getElementById('feedback-box-' + miscareId);
+    if (!box) return;
+
+    var culori = {
+        'succes':     '#4CAF50',
+        'bine':       '#c9a84c',
+        'atentie':    '#FF9800',
+        'incurajare': '#2196F3',
+        'info':       'rgba(245,240,232,0.4)'
+    };
+
+    var iconite = {
+        'succes':     '&#10003;',
+        'bine':       '&#9670;',
+        'atentie':    '&#9888;',
+        'incurajare': '&#9829;',
+        'info':       '&#9432;'
+    };
+
+    var culoare = culori[data.tip] || culori['info'];
+    var iconita = iconite[data.tip] || iconite['info'];
+
+    var html = '<div style="border-left: 3px solid ' + culoare + '; padding-left: 12px;">';
+    html += '<div style="color:' + culoare + '; font-weight:600; margin-bottom:6px; font-size:14px;">';
+    html += iconita + ' ' + data.mesaj + '</div>';
+
+    if (data.detalii && data.detalii.length > 0) {
+        data.detalii.forEach(function(d) {
+            html += '<div style="color:rgba(245,240,232,0.5); font-size:12px; margin-top:4px;">&#9654; ' + d + '</div>';
+        });
+    }
+
+    if (data.scor > 0) {
+        html += '<div style="margin-top:10px;">';
+        html += '<div style="font-size:11px; color:rgba(245,240,232,0.4); margin-bottom:4px; letter-spacing:1px;">SCOR POZITIE</div>';
+        html += '<div style="background:rgba(255,255,255,0.05); border-radius:10px; height:6px; overflow:hidden;">';
+        html += '<div style="width:' + data.scor + '%; height:100%; background:' + culoare + '; border-radius:10px; transition:width 0.5s ease;"></div>';
+        html += '</div></div>';
+    }
+
+    html += '</div>';
+    box.innerHTML = html;
+}
+
+function lanceazaConfetti() {
+    var container = document.getElementById('confetti');
+    container.innerHTML = '';
+    container.classList.add('activ');
+    var culori = ['#c9a84c', '#e8c96d', '#f5f0e8', '#ffd700'];
+    for (var i = 0; i < 80; i++) {
+        var piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = (Math.random() * 100) + '%';
+        piece.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+        piece.style.animationDelay = (Math.random() * 0.8) + 's';
+        piece.style.background = culori[Math.floor(Math.random() * culori.length)];
+        piece.style.width = (Math.random() * 8 + 4) + 'px';
+        piece.style.height = (Math.random() * 8 + 4) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+        container.appendChild(piece);
+    }
+    setTimeout(function() { container.classList.remove('activ'); }, 3000);
+}
+
+function arataSucees(numeMiscare) {
+    lanceazaConfetti();
+    document.getElementById('succesText').innerHTML =
+        'Ai finalizat <strong>' + numeMiscare + '</strong>!<br>Continua spre urmatoarea!';
+    document.getElementById('succesOverlay').classList.add('activ');
+}
+
+function inchideSucces() {
+    document.getElementById('succesOverlay').classList.remove('activ');
+}
+</script>
+
+<script>
+    var dansContext = '{{ dans_nume }}';
+</script>
+</body>
+</html>

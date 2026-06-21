@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dance App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ============ HERO SECTION ============ -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="hero-badge">✦ Dans Sportiv ✦</div>
+        <h1 class="hero-title">Invata sa dansezi.<br>Pasul tau incepe aici.</h1>
+        <p class="hero-subtitle">
+            O aplicatie creata din pasiune, dedicata tuturor celor care vor
+            sa descopere frumusetea dansului sportiv clasic.
+        </p>
+        <div class="hero-buttons">
+            <a href="#dansuri" class="btn-hero-primary">Incepe acum</a>
+            <a href="#despre" class="btn-hero-secondary">Povestea mea</a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <span class="stat-nr">4</span>
+                <span class="stat-label">Stiluri de dans</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-nr">18</span>
+                <span class="stat-label">Miscari</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-nr">3</span>
+                <span class="stat-label">Niveluri</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-nr">11</span>
+                <span class="stat-label">Ani experienta</span>
+            </div>
+        </div>
+    </div>
+    <div class="hero-scroll">
+        <span>Descopera</span>
+        <div class="scroll-arrow"></div>
+    </div>
+</section>
+
+<!-- ============ ROMANIA PE LOCUL 1 ============ -->
+<section class="romania-section">
+    <div class="container">
+        <div class="romania-content">
+            <div class="romania-text">
+                <div class="section-badge">&#127774; Mandrie Nationala</div>
+                <h2>Romania, Liderul Mondial al Dansului Sportiv</h2>
+                <p>
+                    La WDSF DanceSport Festival 2026, Romania a ocupat 
+                    <strong>locul 1 in clasamentul mondial</strong> cu 
+                    7 medalii de aur, 6 de argint si 2 de bronz.
+                </p>
+                <p>
+                    Rares Cojoc si Andreea Matei, perechea noastra nationala, 
+                    sunt <strong>campioni mondiali</strong> la dans sportiv 
+                    sectiunea Standard, castigand WDSF GrandSlam in Shanghai 
+                    si Stuttgart.
+                </p>
+                <p class="romania-paradox">
+                    Si totusi, cu toate aceste rezultate extraordinare, 
+                    dansul sportiv ramane unul dintre sporturile 
+                    <strong>cel mai putin sustinute</strong> de statul roman. 
+                    Aceasta aplicatie este raspunsul meu la aceasta problema.
+                </p>
+            </div>
+            <div class="romania-images">
+                <img src="{{ url_for('static', filename='images/wdsf.jpeg') }}" 
+                     alt="WDSF Medal Table 2026" class="romania-img-main">
+                <div class="romania-imgs-row">
+                    <img src="{{ url_for('static', filename='images/podium1.jpeg') }}" 
+                         alt="Campioni mondiali" class="romania-img-small">
+                    <img src="{{ url_for('static', filename='images/podium2.jpeg') }}" 
+                         alt="Podium WDSF" class="romania-img-small">
+                    <img src="{{ url_for('static', filename='images/podium3.jpeg') }}" 
+                         alt="Podium dans" class="romania-img-small">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ DESPRE MINE ============ -->
+<section class="despre-section" id="despre">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">&#10022; Povestea Aplicatiei</div>
+            <h2>Creata din 11 ani de dans si pasiune</h2>
+        </div>
+        <div class="despre-content">
+            <div class="despre-images">
+                <img src="{{ url_for('static', filename='images/hero.jpeg') }}" 
+                     alt="Dans spectacol" class="despre-img-main">
+                <img src="{{ url_for('static', filename='images/despre.jpeg') }}" 
+                     alt="Backstage dans" class="despre-img-secondary">
+            </div>
+            <div class="despre-text">
+                <p>
+                    Am inceput sa dansez la 7 ani si am practicat dansul sportiv 
+                    timp de 11 ani la nivel de performanta. Am participat la 
+                    concursuri nationale si internationale, am urcat pe podium 
+                    si am inteles din interior cat de complex si frumos este 
+                    acest sport.
+                </p>
+                <p>
+                    Aceasta aplicatie s-a nascut dintr-o nevoie reala: 
+                    lipsa unui partener, costurile ridicate ale lectiilor private 
+                    si absenta resurselor digitale structurate pentru dansul 
+                    sportiv clasic.
+                </p>
+                <p>
+                    Acum, prin tehnologie, oricine poate face primul pas 
+                    pe ringul de dans.
+                </p>
+                <div class="despre-premii">
+                    <img src="{{ url_for('static', filename='images/premiu1.jpeg') }}" 
+                         alt="Premiu concurs" class="premiu-img">
+                    <img src="{{ url_for('static', filename='images/premiu2.jpeg') }}" 
+                         alt="Premiu concurs" class="premiu-img">
+                    <img src="{{ url_for('static', filename='images/medalii.jpeg') }}" 
+                         alt="Medalii" class="premiu-img">
+                </div>
+                <a href="/progres" class="btn-gold">
+                    &#9654; Vezi progresul meu
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ DANSURI ============ -->
+<section class="dansuri-section" id="dansuri">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">&#128131; Alege stilul tau</div>
+            <h2>Patru stiluri. O pasiune.</h2>
+            <p class="section-subtitle">
+                De la ritmul jucaus al Cha-Cha-Cha pana la eleganta 
+                plutitoare a Valsului Lent, fiecare pas te aduce 
+                mai aproape de dans.
+            </p>
+        </div>
+
+        <div class="categorii">
+
+            <div class="categorie-bloc">
+                <div class="categorie-titlu">
+                    <span class="categorie-linie"></span>
+                    <span>Latino</span>
+                    <span class="categorie-linie"></span>
+                </div>
+                <div class="dans-grid">
+                    <div class="dans-card" onclick="window.location='/dans/chacha'">
+                        <div class="dans-card-img">
+                           <img src="{{ url_for('static', filename='images/latino1.jpeg') }}" 
+                                alt="Cha-Cha-Cha" style="object-position: center 15%;">
+                            <div class="dans-card-overlay">
+                                <span class="dans-card-badge">Latino</span>
+                            </div>
+                        </div>
+                        <div class="dans-card-body">
+                            <h3>Cha-Cha-Cha</h3>
+                            <p>Dans ritmic, jucaus si plin de energie</p>
+                            <div class="dans-card-info">
+                                <span>5 miscari</span>
+                                <span>3 niveluri</span>
+                            </div>
+                            <button class="btn-dans">Incepe &#8594;</button>
+                        </div>
+                    </div>
+
+                    <div class="dans-card" onclick="window.location='/dans/jive'">
+                        <div class="dans-card-img">
+                            <img src="{{ url_for('static', filename='images/latino2.jpeg') }}" 
+                              alt="Jive" style="object-position: center 25%;">
+                            <div class="dans-card-overlay">
+                                <span class="dans-card-badge">Latino</span>
+                            </div>
+                        </div>
+                        <div class="dans-card-body">
+                            <h3>Jive</h3>
+                            <p>Dans rapid derivat din Rock and Roll</p>
+                            <div class="dans-card-info">
+                                <span>5 miscari</span>
+                                <span>3 niveluri</span>
+                            </div>
+                            <button class="btn-dans">Incepe &#8594;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="categorie-bloc">
+                <div class="categorie-titlu">
+                    <span class="categorie-linie"></span>
+                    <span>Standard</span>
+                    <span class="categorie-linie"></span>
+                </div>
+                <div class="dans-grid">
+                    <div class="dans-card" onclick="window.location='/dans/vals'">
+                        <div class="dans-card-img">
+                           <img src="{{ url_for('static', filename='images/standard1.jpeg') }}" 
+                           alt="Vals Lent" style="object-position: center 20%;">
+                            <div class="dans-card-overlay">
+                                <span class="dans-card-badge">Standard</span>
+                            </div>
+                        </div>
+                        <div class="dans-card-body">
+                            <h3>Vals Lent</h3>
+                            <p>Dans elegant, fluid si plutitor</p>
+                            <div class="dans-card-info">
+                                <span>4 miscari</span>
+                                <span>3 niveluri</span>
+                            </div>
+                            <button class="btn-dans">Incepe &#8594;</button>
+                        </div>
+                    </div>
+
+                    <div class="dans-card" onclick="window.location='/dans/quickstep'">
+                        <div class="dans-card-img">
+                            <img src="{{ url_for('static', filename='images/standard2.jpeg') }}" 
+                                    alt="Quickstep" style="object-position: center 20%;">
+                            <div class="dans-card-overlay">
+                                <span class="dans-card-badge">Standard</span>
+                            </div>
+                        </div>
+                        <div class="dans-card-body">
+                            <h3>Quickstep</h3>
+                            <p>Dans rapid, vesel si dinamic</p>
+                            <div class="dans-card-info">
+                                <span>3 miscari</span>
+                                <span>3 niveluri</span>
+                            </div>
+                            <button class="btn-dans">Incepe &#8594;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ============ GALERIE ============ -->
+<section class="galerie-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">&#128247; Galerie</div>
+            <h2>Dans la cel mai inalt nivel</h2>
+        </div>
+        <div class="galerie-grid">
+            <img src="{{ url_for('static', filename='images/hero.jpeg') }}" 
+                 alt="Dans spectacol" class="galerie-img galerie-big">
+            <img src="{{ url_for('static', filename='images/latino1.jpeg') }}" 
+                 alt="Latino dans" class="galerie-img">
+            <img src="{{ url_for('static', filename='images/standard1.jpeg') }}" 
+                 alt="Standard dans" class="galerie-img">
+            <img src="{{ url_for('static', filename='images/latino2.jpeg') }}" 
+                 alt="Latino dans" class="galerie-img">
+            <img src="{{ url_for('static', filename='images/premiu1.jpeg') }}" 
+                 alt="Premiu" class="galerie-img">
+            <img src="{{ url_for('static', filename='images/podium1.jpeg') }}" 
+                 alt="Podium" class="galerie-img">
+        </div>
+    </div>
+</section>
+
+<!-- ============ NAVBAR BOTTOM ============ -->
+<nav class="bottom-nav">
+    <a href="/progres" class="bottom-nav-item">
+        <span class="bottom-nav-icon">&#9670;</span>
+        <span>Progres</span>
+    </a>
+    <a href="/istoric" class="bottom-nav-item">
+        <span class="bottom-nav-icon">&#9654;</span>
+        <span>Istoric</span>
+    </a>
+    <a href="/camera" class="bottom-nav-item">
+        <span class="bottom-nav-icon">&#9632;</span>
+        <span>Camera</span>
+    </a>
+    <a href="/logout" class="bottom-nav-item bottom-nav-logout">
+        <span class="bottom-nav-icon">&#9135;</span>
+        <span>Iesire</span>
+    </a>
+</nav>
+
+<script>
+// Animatie numere statistici
+function animateNumbers() {
+    document.querySelectorAll('.stat-nr').forEach(el => {
+        const target = parseInt(el.textContent);
+        let current = 0;
+        const step = target / 30;
+        const timer = setInterval(() => {
+            current += step;
+            if (current >= target) {
+                el.textContent = target;
+                clearInterval(timer);
+            } else {
+                el.textContent = Math.floor(current);
+            }
+        }, 50);
+    });
+}
+
+// Scroll smooth pentru link-uri
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href'))
+                .scrollIntoView({ behavior: 'smooth' });
+    });
+});
+
+// Porneste animatia cand pagina se incarca
+window.addEventListener('load', animateNumbers);
+
+// Animatie carduri la scroll
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.dans-card, .romania-content, .despre-content')
+        .forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

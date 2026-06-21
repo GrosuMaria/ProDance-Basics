@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La revedere!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .logout-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logout-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('/static/images/hero.jpeg');
+            background-size: cover;
+            background-position: center 40%;
+            filter: brightness(0.25) grayscale(60%);
+            transform: scale(1.05);
+        }
+
+        .logout-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(10,10,20,0.85) 0%,
+                rgba(10,10,20,0.70) 100%
+            );
+        }
+
+        /* Cortina animata */
+        .cortina {
+            position: fixed;
+            inset: 0;
+            background: #0a0a14;
+            z-index: 100;
+            transform: translateY(0);
+            animation: cortina 1.2s cubic-bezier(0.77,0,0.18,1) 0.2s forwards;
+        }
+
+        @keyframes cortina {
+            from { transform: translateY(0); }
+            to   { transform: translateY(-100%); }
+        }
+
+        .logout-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 1s forwards;
+            max-width: 600px;
+        }
+
+        .logout-icon {
+            font-size: 5rem;
+            margin-bottom: 24px;
+            display: block;
+            animation: bounce 1s ease 1.2s both;
+        }
+
+        @keyframes bounce {
+            0%   { transform: scale(0.5); opacity: 0; }
+            60%  { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .logout-badge {
+            display: inline-block;
+            border: 1px solid rgba(201,168,76,0.4);
+            color: #c9a84c;
+            font-size: 11px;
+            letter-spacing: 4px;
+            padding: 5px 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .logout-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: #f5f0e8;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .logout-title span {
+            color: #c9a84c;
+        }
+
+        .logout-subtitle {
+            color: rgba(245,240,232,0.6);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 48px;
+            font-weight: 300;
+        }
+
+        .logout-stats {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .logout-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(201,168,76,0.08);
+            border: 1px solid rgba(201,168,76,0.2);
+            border-radius: 16px;
+            padding: 20px 28px;
+            min-width: 120px;
+        }
+
+        .logout-stat-nr {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #c9a84c;
+            font-weight: 700;
+        }
+
+        .logout-stat-label {
+            font-size: 11px;
+            color: rgba(245,240,232,0.5);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 6px;
+        }
+
+        .logout-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-reintra {
+            background: #c9a84c;
+            color: #0a0a14;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(201,168,76,0.35);
+            animation: pulse 2s infinite 2s;
+        }
+
+        .btn-reintra:hover {
+            background: #e8c96d;
+            transform: translateY(-3px);
+            box-shadow: 0 14px 35px rgba(201,168,76,0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 8px 25px rgba(201,168,76,0.35); }
+            50% { box-shadow: 0 8px 40px rgba(201,168,76,0.65); }
+        }
+
+        .logout-quote {
+            margin-top: 48px;
+            padding: 0 20px;
+        }
+
+        .logout-quote blockquote {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: rgba(245,240,232,0.4);
+            font-size: 1rem;
+            line-height: 1.7;
+            border-left: 2px solid rgba(201,168,76,0.4);
+            padding-left: 16px;
+            text-align: left;
+        }
+
+        /* Particule aurii */
+        .particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .p {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #c9a84c;
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatUp var(--d) ease-in infinite;
+            animation-delay: var(--dl);
+            left: var(--l);
+            top: var(--t);
+        }
+
+        @keyframes floatUp {
+            0%   { opacity: 0; transform: translateY(0) scale(1); }
+            20%  { opacity: 0.8; }
+            100% { opacity: 0; transform: translateY(-150px) scale(0.3); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Cortina care se ridica -->
+<div class="cortina"></div>
+
+<div class="logout-page">
+    <div class="logout-bg"></div>
+    <div class="logout-overlay"></div>
+
+    <!-- Particule -->
+    <div class="particles">
+        <div class="p" style="--l:10%;--t:80%;--d:3s;--dl:0s;"></div>
+        <div class="p" style="--l:20%;--t:85%;--d:4s;--dl:0.5s;"></div>
+        <div class="p" style="--l:35%;--t:75%;--d:3.5s;--dl:1s;"></div>
+        <div class="p" style="--l:50%;--t:90%;--d:5s;--dl:0.3s;"></div>
+        <div class="p" style="--l:65%;--t:80%;--d:4s;--dl:1.5s;"></div>
+        <div class="p" style="--l:80%;--t:85%;--d:3s;--dl:0.8s;"></div>
+        <div class="p" style="--l:90%;--t:75%;--d:4.5s;--dl:0.2s;"></div>
+        <div class="p" style="--l:25%;--t:70%;--d:3.8s;--dl:1.2s;"></div>
+        <div class="p" style="--l:70%;--t:70%;--d:4.2s;--dl:0.7s;"></div>
+        <div class="p" style="--l:45%;--t:88%;--d:3.2s;--dl:1.8s;"></div>
+    </div>
+
+    <div class="logout-content">
+        <span class="logout-icon">&#128131;</span>
+
+        <div class="logout-badge">✦ SESIUNE INCHEIATA ✦</div>
+
+        <h1 class="logout-title">
+            La revedere,<br>
+            <span>{{ username }}!</span>
+        </h1>
+
+        <p class="logout-subtitle">
+            Progresul tau a fost salvat.<br>
+            Fiecare pas dansat azi te aduce mai aproape de perfectiune.
+        </p>
+
+        <div class="logout-stats">
+            <div class="logout-stat">
+                <span class="logout-stat-nr">&#9670;</span>
+                <span class="logout-stat-label">Progres salvat</span>
+            </div>
+            <div class="logout-stat">
+                <span class="logout-stat-nr">&#9654;</span>
+                <span class="logout-stat-label">Istoric actualizat</span>
+            </div>
+            <div class="logout-stat">
+                <span class="logout-stat-nr">&#10022;</span>
+                <span class="logout-stat-label">Pe curand</span>
+            </div>
+        </div>
+
+        <div class="logout-buttons">
+            <a href="/" class="btn-reintra">
+                &#9654; Reintra in dans
+            </a>
+        </div>
+
+        <div class="logout-quote">
+            <blockquote>
+                "Dansul este poezia piciorului." --- John Dryden
+            </blockquote>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

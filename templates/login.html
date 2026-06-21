@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dance App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .login-page {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+        }
+
+        /* ---- STANGA --- imagine + text inspirational */
+        .login-left {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-left-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('/static/images/hero.jpeg');
+            background-size: cover;
+            background-position: center 40%;
+            filter: brightness(0.45);
+            transform: scale(1.05);
+            transition: transform 8s ease;
+        }
+
+        .login-left-bg.zoomed {
+            transform: scale(1.0);
+        }
+
+        .login-left-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(10,10,20,0.3) 0%,
+                rgba(201,168,76,0.08) 100%
+            );
+        }
+
+        .login-left-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px;
+        }
+
+        .login-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: #c9a84c;
+            letter-spacing: 4px;
+            opacity: 0;
+            animation: fadeInDown 0.8s ease 0.3s forwards;
+        }
+
+        .login-hero-text {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.6s forwards;
+        }
+
+        .login-hero-text h1 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            color: #f5f0e8;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .login-hero-text h1 span {
+            color: #c9a84c;
+        }
+
+        .login-hero-text p {
+            color: rgba(245,240,232,0.75);
+            font-size: 1rem;
+            line-height: 1.8;
+            max-width: 420px;
+            font-weight: 300;
+        }
+
+        .login-facts {
+            display: flex;
+            gap: 32px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.9s forwards;
+        }
+
+        .login-fact {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-fact-nr {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #c9a84c;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .login-fact-label {
+            font-size: 11px;
+            color: rgba(245,240,232,0.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .login-fact-divider {
+            width: 1px;
+            background: rgba(201,168,76,0.3);
+            align-self: stretch;
+        }
+
+        /* ---- DREAPTA --- formular */
+        .login-right {
+            background: #0a0a14;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-right::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            right: -200px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(
+                circle,
+                rgba(201,168,76,0.08) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+
+        .login-right::after {
+            content: '';
+            position: absolute;
+            bottom: -200px;
+            left: -200px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(
+                circle,
+                rgba(201,168,76,0.05) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+
+        .login-form-container {
+            width: 100%;
+            max-width: 380px;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.4s forwards;
+        }
+
+        .login-form-header {
+            margin-bottom: 36px;
+        }
+
+        .login-form-header .badge {
+            display: inline-block;
+            border: 1px solid rgba(201,168,76,0.4);
+            color: #c9a84c;
+            font-size: 11px;
+            letter-spacing: 3px;
+            padding: 5px 16px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        .login-form-header h2 {
+            font-size: 2rem;
+            color: #f5f0e8;
+            margin-bottom: 8px;
+        }
+
+        .login-form-header p {
+            color: rgba(245,240,232,0.5);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: rgba(245,240,232,0.5);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(201,168,76,0.2);
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: #f5f0e8;
+            font-family: 'Raleway', sans-serif;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #c9a84c;
+            background: rgba(201,168,76,0.05);
+            box-shadow: 0 0 20px rgba(201,168,76,0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(245,240,232,0.25);
+        }
+
+        .btn-login {
+            width: 100%;
+            background: #c9a84c;
+            color: #0a0a14;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(201,168,76,0.3);
+        }
+
+        .btn-login:hover {
+            background: #e8c96d;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(201,168,76,0.45);
+        }
+
+        .login-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        .login-divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(201,168,76,0.15);
+        }
+
+        .login-divider span {
+            color: rgba(245,240,232,0.3);
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+
+        .login-register-link {
+            text-align: center;
+            color: rgba(245,240,232,0.5);
+            font-size: 14px;
+        }
+
+        .login-register-link a {
+            color: #c9a84c;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-register-link a:hover {
+            color: #e8c96d;
+        }
+
+        .error-box {
+            background: rgba(255,107,107,0.1);
+            border: 1px solid rgba(255,107,107,0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .success-box {
+            background: rgba(201,168,76,0.1);
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #c9a84c;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Particule decorative */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #c9a84c;
+            border-radius: 50%;
+            opacity: 0;
+            animation: float var(--duration) ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+
+        /* Quote rotativ */
+        .login-quote {
+            position: absolute;
+            bottom: 48px;
+            left: 48px;
+            right: 48px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 1.2s forwards;
+        }
+
+        .login-quote blockquote {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: rgba(245,240,232,0.5);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            border-left: 2px solid #c9a84c;
+            padding-left: 16px;
+        }
+
+        /* Animatii */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0% { opacity: 0; transform: translateY(0) translateX(0); }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.3; }
+            100% { opacity: 0; transform: translateY(-120px) translateX(20px); }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .login-page { grid-template-columns: 1fr; }
+            .login-left { display: none; }
+            .login-right { padding: 32px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-page">
+
+    <!-- ======= STANGA ======= -->
+    <div class="login-left">
+        <div class="login-left-bg" id="loginBg"></div>
+        <div class="login-left-overlay"></div>
+
+        <!-- Particule aurii -->
+        <div class="particle" style="left:15%;top:80%;--duration:4s;--delay:0s;"></div>
+        <div class="particle" style="left:30%;top:70%;--duration:5s;--delay:1s;"></div>
+        <div class="particle" style="left:60%;top:85%;--duration:3.5s;--delay:0.5s;"></div>
+        <div class="particle" style="left:75%;top:75%;--duration:6s;--delay:2s;"></div>
+        <div class="particle" style="left:45%;top:90%;--duration:4.5s;--delay:1.5s;"></div>
+
+        <div class="login-left-content">
+            <div class="login-logo">✦ Dance App ✦</div>
+
+            <div class="login-hero-text">
+                <h1>
+                    Danseaza.<br>
+                    Evolueaza.<br>
+                    <span>Straluceste.</span>
+                </h1>
+                <p>
+                    Romania este liderul mondial al dansului sportiv,
+                    cu 7 medalii de aur la WDSF 2026. Acum, pentru
+                    prima oara, poti invata stilurile Standard si Latino
+                    acasa, pas cu pas, la orice nivel.
+                </p>
+            </div>
+
+            <div class="login-facts">
+                <div class="login-fact">
+                    <span class="login-fact-nr">4</span>
+                    <span class="login-fact-label">Stiluri</span>
+                </div>
+                <div class="login-fact-divider"></div>
+                <div class="login-fact">
+                    <span class="login-fact-nr">18</span>
+                    <span class="login-fact-label">Miscari</span>
+                </div>
+                <div class="login-fact-divider"></div>
+                <div class="login-fact">
+                    <span class="login-fact-nr">3</span>
+                    <span class="login-fact-label">Niveluri</span>
+                </div>
+                <div class="login-fact-divider"></div>
+                <div class="login-fact">
+                    <span class="login-fact-nr">#1</span>
+                    <span class="login-fact-label">Romania WDSF</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======= DREAPTA ======= -->
+    <div class="login-right">
+        <div class="login-form-container">
+
+            <div class="login-form-header">
+                <div class="badge">✦ BINE AI VENIT</div>
+                <h2>Intra in cont</h2>
+                <p>Continua calatoria ta in lumea dansului sportiv</p>
+            </div>
+
+            {% if eroare %}
+                <div class="error-box">&#9888; {{ eroare }}</div>
+            {% endif %}
+
+            {% if succes %}
+                <div class="success-box">&#10003; {{ succes }}</div>
+            {% endif %}
+
+            <form action="/login" method="POST">
+                <div class="form-group">
+                    <label class="form-label">Nume utilizator</label>
+                    <input type="text" name="username"
+                           placeholder="Scrie username-ul tau..."
+                           class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Parola</label>
+                    <input type="password" name="parola"
+                           placeholder="Scrie parola ta..."
+                           class="form-input" required>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    Intra in cont &rarr;
+                </button>
+            </form>
+
+            <div class="login-divider">
+                <div class="login-divider-line"></div>
+                <span>SAU</span>
+                <div class="login-divider-line"></div>
+            </div>
+
+            <div class="login-register-link">
+                Nu ai cont inca?
+                <a href="/inregistrare">Inregistreaza-te gratuit</a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Zoom lent pe poza din stanga
+    setTimeout(() => {
+        document.getElementById('loginBg')
+                .classList.add('zoomed');
+    }, 100);
+
+    // Schimba poza din stanga la fiecare 6 secunde
+    const poze = [
+        '/static/images/hero.jpeg',
+        '/static/images/latino1.jpeg',
+        '/static/images/standard2.jpeg'
+    ];
+    let pozaIndex = 0;
+    setInterval(() => {
+        pozaIndex = (pozaIndex + 1) % poze.length;
+        const bg = document.getElementById('loginBg');
+        bg.style.opacity = '0';
+        bg.style.transition = 'opacity 1s ease';
+        setTimeout(() => {
+            bg.style.backgroundImage = `url('${poze[pozaIndex]}')`;
+            bg.style.opacity = '1';
+        }, 1000);
+    }, 6000);
+</script>
+
+</body>
+</html>

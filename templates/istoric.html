@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Istoric sesiuni</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .istoric-page {
+            min-height: 100vh;
+            background: #0a0a14;
+            padding-bottom: 60px;
+        }
+
+        .istoric-header {
+            position: relative;
+            padding: 60px 24px 48px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .istoric-header::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 400px;
+            background: radial-gradient(
+                ellipse,
+                rgba(201,168,76,0.1) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            color: rgba(245,240,232,0.5);
+            font-size: 14px;
+            transition: color 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-btn:hover { color: #c9a84c; }
+
+        .istoric-header .badge {
+            display: inline-block;
+            border: 1px solid rgba(201,168,76,0.4);
+            color: #c9a84c;
+            font-size: 11px;
+            letter-spacing: 4px;
+            padding: 5px 20px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        .istoric-header h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            color: #f5f0e8;
+            margin-bottom: 8px;
+        }
+
+        .istoric-header h1 span { color: #c9a84c; }
+
+        .istoric-header p {
+            color: rgba(245,240,232,0.5);
+            font-size: 1rem;
+        }
+
+        /* TIMELINE */
+        .timeline {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(
+                to bottom,
+                rgba(201,168,76,0.5),
+                rgba(201,168,76,0.1)
+            );
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s ease;
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #12121f;
+            border: 2px solid rgba(201,168,76,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-icon {
+            border-color: #c9a84c;
+            background: rgba(201,168,76,0.1);
+            transform: scale(1.1);
+        }
+
+        .timeline-card {
+            flex: 1;
+            background: #12121f;
+            border: 1px solid rgba(201,168,76,0.1);
+            border-radius: 16px;
+            padding: 18px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-card:hover {
+            border-color: rgba(201,168,76,0.3);
+            background: linear-gradient(
+                135deg,
+                #12121f 0%,
+                rgba(201,168,76,0.03) 100%
+            );
+            transform: translateX(4px);
+        }
+
+        .timeline-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .timeline-dans {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: #f5f0e8;
+        }
+
+        .timeline-tip {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .tip-latino {
+            background: rgba(201,168,76,0.12);
+            border: 1px solid rgba(201,168,76,0.3);
+            color: #c9a84c;
+        }
+
+        .tip-standard {
+            background: rgba(245,240,232,0.08);
+            border: 1px solid rgba(245,240,232,0.2);
+            color: rgba(245,240,232,0.7);
+        }
+
+        .tip-login {
+            background: rgba(100,100,150,0.15);
+            border: 1px solid rgba(100,100,150,0.3);
+            color: rgba(245,240,232,0.4);
+        }
+
+        .timeline-data {
+            color: rgba(245,240,232,0.35);
+            font-size: 12px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .timeline-data::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: #c9a84c;
+            border-radius: 50%;
+        }
+
+        /* GOL */
+        .gol-container {
+            text-align: center;
+            padding: 80px 24px;
+        }
+
+        .gol-icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 20px;
+            opacity: 0.4;
+        }
+
+        .gol-container h3 {
+            font-size: 1.5rem;
+            color: rgba(245,240,232,0.5);
+            margin-bottom: 12px;
+        }
+
+        .gol-container p {
+            color: rgba(245,240,232,0.3);
+            margin-bottom: 28px;
+        }
+
+        .btn-incepe-acum {
+            display: inline-block;
+            background: #c9a84c;
+            color: #0a0a14;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-incepe-acum:hover {
+            background: #e8c96d;
+            transform: translateY(-2px);
+        }
+
+        /* SUMAR */
+        .sumar-sesiuni {
+            max-width: 700px;
+            margin: 0 auto 40px;
+            padding: 0 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .sumar-sesiuni-card {
+            flex: 1;
+            background: rgba(201,168,76,0.05);
+            border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .sumar-sesiuni-nr {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: #c9a84c;
+            font-weight: 700;
+            display: block;
+        }
+
+        .sumar-sesiuni-label {
+            font-size: 11px;
+            color: rgba(245,240,232,0.4);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="istoric-page">
+
+    <div class="istoric-header">
+        <a href="/home" class="back-btn">&#8592; Inapoi</a>
+        <div class="badge">&#9670; ACTIVITATEA TA</div>
+        <h1>Istoricul tau, <span>{{ username }}</span>!</h1>
+        <p>Ultimele 10 sesiuni de dans inregistrate</p>
+    </div>
+
+    {% if sesiuni %}
+
+    <!-- SUMAR -->
+    {% set dans_sesiuni = sesiuni|selectattr('dans_practicat')|list %}
+    <div class="sumar-sesiuni">
+        <div class="sumar-sesiuni-card">
+            <span class="sumar-sesiuni-nr">{{ sesiuni|length }}</span>
+            <span class="sumar-sesiuni-label">Sesiuni totale</span>
+        </div>
+        <div class="sumar-sesiuni-card">
+            <span class="sumar-sesiuni-nr">{{ dans_sesiuni|length }}</span>
+            <span class="sumar-sesiuni-label">Sesiuni dans</span>
+        </div>
+        <div class="sumar-sesiuni-card">
+            <span class="sumar-sesiuni-nr">&#9670;</span>
+            <span class="sumar-sesiuni-label">Progres salvat</span>
+        </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="timeline">
+        {% for sesiune in sesiuni %}
+
+        {% if sesiune.dans_practicat %}
+            {% set icon = '&#128131;' %}
+            {% if 'Cha' in sesiune.dans_practicat %}
+                {% set icon = '&#128131;' %}
+            {% elif 'Jive' in sesiune.dans_practicat %}
+                {% set icon = '&#9889;' %}
+            {% elif 'Vals' in sesiune.dans_practicat %}
+                {% set icon = '&#10022;' %}
+            {% elif 'Quick' in sesiune.dans_practicat %}
+                {% set icon = '&#9654;' %}
+            {% endif %}
+
+            {% set tip_class = 'tip-latino' %}
+            {% set tip_text = 'Latino' %}
+            {% if 'Vals' in sesiune.dans_practicat or 'Quick' in sesiune.dans_practicat %}
+                {% set tip_class = 'tip-standard' %}
+                {% set tip_text = 'Standard' %}
+            {% endif %}
+        {% else %}
+            {% set icon = '&#9670;' %}
+            {% set tip_class = 'tip-login' %}
+            {% set tip_text = 'Login' %}
+        {% endif %}
+
+        <div class="timeline-item">
+            <div class="timeline-icon">{{ icon }}</div>
+            <div class="timeline-card">
+                <div class="timeline-card-top">
+                    <span class="timeline-dans">
+                        {% if sesiune.dans_practicat %}
+                            {{ sesiune.dans_practicat }}
+                        {% else %}
+                            Autentificare
+                        {% endif %}
+                    </span>
+                    <span class="timeline-tip {{ tip_class }}">
+                        {{ tip_text }}
+                    </span>
+                </div>
+                <div class="timeline-data">
+                    {{ sesiune.data_login }}
+                </div>
+            </div>
+        </div>
+
+        {% endfor %}
+    </div>
+
+    {% else %}
+
+    <div class="gol-container">
+        <span class="gol-icon">&#128131;</span>
+        <h3>Nicio sesiune inregistrata inca</h3>
+        <p>Incepe primul tau dans si istoricul tau va aparea aici!</p>
+        <a href="/home" class="btn-incepe-acum">
+            &#9654; Incepe primul dans
+        </a>
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+            setTimeout(() => {
+                entry.target.classList.add('visible');
+            }, index * 80);
+        }
+    });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.timeline-item')
+        .forEach(item => observer.observe(item));
+</script>
+
+</body>
+</html>

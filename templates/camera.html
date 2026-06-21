@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detectare Miscari - Dance App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .camera-page {
+            min-height: 100vh;
+            background: #0a0a14;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .camera-header {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid rgba(201,168,76,0.15);
+            background: rgba(10,10,20,0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .camera-header-back {
+            color: rgba(245,240,232,0.5);
+            font-size: 20px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .camera-header-back:hover { color: #c9a84c; }
+
+        .camera-header-title {
+            flex: 1;
+        }
+
+        .camera-header-title h2 {
+            font-size: 1.2rem;
+            color: #f5f0e8;
+            margin-bottom: 2px;
+        }
+
+        .camera-header-title p {
+            font-size: 12px;
+            color: rgba(245,240,232,0.4);
+            letter-spacing: 1px;
+        }
+
+        .camera-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #c9a84c;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #c9a84c;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        .status-dot.oprit {
+            background: rgba(245,240,232,0.3);
+            animation: none;
+        }
+
+        /* CONTINUT PRINCIPAL */
+        .camera-main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 24px;
+            gap: 24px;
+        }
+
+        /* SECTIUNEA CAMERA */
+        .camera-sectiune {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .camera-feed-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #12121f;
+            border: 1px solid rgba(201,168,76,0.2);
+            aspect-ratio: 4/3;
+        }
+
+        .camera-feed-container.activa {
+            border-color: #c9a84c;
+            box-shadow: 0 0 30px rgba(201,168,76,0.15);
+        }
+
+        #camera-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        #camera-feed.activa { display: block; }
+
+        .camera-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .camera-placeholder.ascuns { display: none; }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            opacity: 0.3;
+        }
+
+        .placeholder-text {
+            color: rgba(245,240,232,0.3);
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* Overlay cu informatii pe camera */
+        .camera-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            display: none;
+        }
+
+        .camera-overlay.activa { display: block; }
+
+        .overlay-colt {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-color: #c9a84c;
+            border-style: solid;
+            opacity: 0.6;
+        }
+
+        .overlay-colt.tl {
+            top: 16px; left: 16px;
+            border-width: 2px 0 0 2px;
+        }
+
+        .overlay-colt.tr {
+            top: 16px; right: 16px;
+            border-width: 2px 2px 0 0;
+        }
+
+        .overlay-colt.bl {
+            bottom: 16px; left: 16px;
+            border-width: 0 0 2px 2px;
+        }
+
+        .overlay-colt.br {
+            bottom: 16px; right: 16px;
+            border-width: 0 2px 2px 0;
+        }
+
+        .overlay-info {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10,10,20,0.8);
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 11px;
+            color: #c9a84c;
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+
+        /* BUTOANE CAMERA */
+        .camera-butoane {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-porneste {
+            flex: 1;
+            background: #c9a84c;
+            color: #0a0a14;
+            border: none;
+            border-radius: 14px;
+            padding: 16px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-porneste:hover {
+            background: #e8c96d;
+            transform: translateY(-2px);
+        }
+
+        .btn-porneste.oprit {
+            background: transparent;
+            border: 1px solid rgba(255,107,107,0.4);
+            color: #ff6b6b;
+        }
+
+        .btn-porneste.oprit:hover {
+            background: rgba(255,107,107,0.1);
+            transform: translateY(-2px);
+        }
+
+        /* SFATURI */
+        .sfaturi-card {
+            background: #12121f;
+            border: 1px solid rgba(201,168,76,0.1);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .sfaturi-titlu {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #c9a84c;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .sfat {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: rgba(245,240,232,0.5);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .sfat-icon {
+            color: #c9a84c;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* PANEL DREAPTA */
+        .camera-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* SELECTARE DANS */
+        .dans-selector {
+            background: #12121f;
+            border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .panel-titlu {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #c9a84c;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .dans-optiuni {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .dans-optiune {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(201,168,76,0.1);
+            border-radius: 10px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .dans-optiune:hover {
+            border-color: rgba(201,168,76,0.3);
+            background: rgba(201,168,76,0.05);
+        }
+
+        .dans-optiune.selectat {
+            border-color: #c9a84c;
+            background: rgba(201,168,76,0.1);
+        }
+
+        .dans-optiune-nume {
+            font-size: 13px;
+            color: #f5f0e8;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .dans-optiune-cat {
+            font-size: 10px;
+            color: rgba(245,240,232,0.4);
+            letter-spacing: 1px;
+        }
+
+        .dans-optiune.selectat .dans-optiune-nume { color: #c9a84c; }
+
+        /* FEEDBACK PANEL */
+        .feedback-panel {
+            background: #12121f;
+            border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 16px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .feedback-continut {
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .feedback-asteptare {
+            text-align: center;
+            color: rgba(245,240,232,0.25);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .feedback-mesaj {
+            display: none;
+        }
+
+        .feedback-mesaj.activ { display: block; }
+
+        .feedback-principal {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .feedback-detaliu {
+            font-size: 13px;
+            color: rgba(245,240,232,0.5);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            line-height: 1.5;
+        }
+
+        .feedback-scor-label {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: rgba(245,240,232,0.3);
+            margin-top: 14px;
+            margin-bottom: 6px;
+        }
+
+        .feedback-bara-bg {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .feedback-bara-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            width: 0%;
+        }
+
+        /* INFORMATII ARTICULATII */
+        .articulatii-panel {
+            background: #12121f;
+            border: 1px solid rgba(201,168,76,0.1);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .articulatii-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .articulatie-card {
+            background: rgba(255,255,255,0.02);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .articulatie-label {
+            font-size: 10px;
+            color: rgba(245,240,232,0.35);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .articulatie-valoare {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: #c9a84c;
+            font-weight: 700;
+        }
+
+        .articulatie-valoare.bun { color: #4CAF50; }
+        .articulatie-valoare.atentie { color: #FF9800; }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        @media (max-width: 768px) {
+            .camera-main { grid-template-columns: 1fr; }
+            .camera-panel { order: -1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="camera-page">
+
+    <!-- HEADER -->
+    <div class="camera-header">
+        <a href="/home" class="camera-header-back">&#8592;</a>
+        <div class="camera-header-title">
+            <h2>Detectare Miscari</h2>
+            <p>ANALIZA IN TIMP REAL</p>
+        </div>
+        <div class="camera-status">
+            <div class="status-dot oprit" id="statusDot"></div>
+            <span id="statusText">OPRITA</span>
+        </div>
+    </div>
+
+    <!-- CONTINUT -->
+    <div class="camera-main">
+
+        <!-- STANGA: Camera + Sfaturi -->
+        <div class="camera-sectiune">
+
+            <!-- Feed camera -->
+            <div class="camera-feed-container" id="feedContainer">
+                <img id="camera-feed" alt="Camera feed">
+
+                <div class="camera-placeholder" id="placeholder">
+                    <span class="placeholder-icon">&#128247;</span>
+                    <span class="placeholder-text">
+                        Apasa "Porneste Camera"<br>
+                        pentru a incepe analiza
+                    </span>
+                </div>
+
+                <div class="camera-overlay" id="cameraOverlay">
+                    <div class="overlay-colt tl"></div>
+                    <div class="overlay-colt tr"></div>
+                    <div class="overlay-colt bl"></div>
+                    <div class="overlay-colt br"></div>
+                    <div class="overlay-info">
+                        &#9670; MEDIAPIPE POSE ACTIV
+                    </div>
+                </div>
+            </div>
+
+            <!-- Butoane -->
+            <div class="camera-butoane">
+                <button class="btn-porneste" id="btnCamera"
+                        onclick="toggleCamera()">
+                    <span>&#9654;</span>
+                    <span id="btnText">Porneste Camera</span>
+                </button>
+            </div>
+
+            <!-- Sfaturi -->
+            <div class="sfaturi-card">
+                <div class="sfaturi-titlu">&#9670; Sfaturi pentru o analiza buna</div>
+                <div class="sfat">
+                    <span class="sfat-icon">&#9654;</span>
+                    <span>Asigura-te ca esti bine iluminat si ca intregul corp este vizibil</span>
+                </div>
+                <div class="sfat">
+                    <span class="sfat-icon">&#9654;</span>
+                    <span>Pozitioneaza camera la nivelul soldurilor sau mai jos</span>
+                </div>
+                <div class="sfat">
+                    <span class="sfat-icon">&#9654;</span>
+                    <span>Pastreaza o distanta de 2-3 metri fata de camera</span>
+                </div>
+                <div class="sfat">
+                    <span class="sfat-icon">&#9654;</span>
+                    <span>Poarta haine care contrasteaza cu fundalul</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- DREAPTA: Panel -->
+        <div class="camera-panel">
+
+            <!-- Selectare dans -->
+            <div class="dans-selector">
+                <div class="panel-titlu">&#9670; Selecteaza dansul</div>
+                <div class="dans-optiuni">
+                    <div class="dans-optiune selectat"
+                         onclick="selectDans(this, 'chacha')">
+                        <div class="dans-optiune-nume">Cha-Cha-Cha</div>
+                        <div class="dans-optiune-cat">Latino</div>
+                    </div>
+                    <div class="dans-optiune"
+                         onclick="selectDans(this, 'jive')">
+                        <div class="dans-optiune-nume">Jive</div>
+                        <div class="dans-optiune-cat">Latino</div>
+                    </div>
+                    <div class="dans-optiune"
+                         onclick="selectDans(this, 'vals')">
+                        <div class="dans-optiune-nume">Vals Lent</div>
+                        <div class="dans-optiune-cat">Standard</div>
+                    </div>
+                    <div class="dans-optiune"
+                         onclick="selectDans(this, 'quickstep')">
+                        <div class="dans-optiune-nume">Quickstep</div>
+                        <div class="dans-optiune-cat">Standard</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback -->
+            <div class="feedback-panel">
+                <div class="panel-titlu">&#9670; Analiza pozitie</div>
+                <div class="feedback-continut">
+                    <div class="feedback-asteptare" id="feedbackAsteptare">
+                        &#9432; Porneste camera pentru<br>a primi feedback in timp real
+                    </div>
+                    <div class="feedback-mesaj" id="feedbackMesaj">
+                        <div class="feedback-principal" id="feedbackPrincipal"></div>
+                        <div id="feedbackDetalii"></div>
+                        <div class="feedback-scor-label">SCOR POZITIE PICIOARE</div>
+                        <div class="feedback-bara-bg">
+                            <div class="feedback-bara-fill" id="feedbackBara"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Articulatii -->
+            <div class="articulatii-panel">
+                <div class="panel-titlu">&#9670; Unghiuri detectate</div>
+                <div class="articulatii-grid">
+                    <div class="articulatie-card">
+                        <div class="articulatie-label">Genunchi Stang</div>
+                        <div class="articulatie-valoare" id="genStang">---</div>
+                    </div>
+                    <div class="articulatie-card">
+                        <div class="articulatie-label">Genunchi Drept</div>
+                        <div class="articulatie-valoare" id="genDrept">---</div>
+                    </div>
+                    <div class="articulatie-card">
+                        <div class="articulatie-label">Picior in Fata</div>
+                        <div class="articulatie-valoare" id="piciorFata">---</div>
+                    </div>
+                    <div class="articulatie-card">
+                        <div class="articulatie-label">Greutate</div>
+                        <div class="articulatie-valoare" id="greutate">---</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+var cameraActiva = false;
+var dansSelectat = 'chacha';
+var feedbackInterval = null;
+
+function toggleCamera() {
+    if (!cameraActiva) {
+        pornesteCamera();
+    } else {
+        opresteCamera();
+    }
+}
+
+function pornesteCamera() {
+    var feed = document.getElementById('camera-feed');
+    var placeholder = document.getElementById('placeholder');
+    var container = document.getElementById('feedContainer');
+    var overlay = document.getElementById('cameraOverlay');
+    var btn = document.getElementById('btnCamera');
+    var btnText = document.getElementById('btnText');
+    var dot = document.getElementById('statusDot');
+    var statusText = document.getElementById('statusText');
+
+    feed.src = '/video_feed/' + dansSelectat;
+    feed.classList.add('activa');
+    placeholder.classList.add('ascuns');
+    container.classList.add('activa');
+    overlay.classList.add('activa');
+
+    btn.classList.add('oprit');
+    btnText.textContent = 'Opreste Camera';
+    btn.querySelector('span:first-child').innerHTML = '&#9632;';
+
+    dot.classList.remove('oprit');
+    statusText.textContent = 'ACTIVA';
+
+    cameraActiva = true;
+
+    document.getElementById('feedbackAsteptare').style.display = 'none';
+    document.getElementById('feedbackMesaj').classList.add('activ');
+
+    feedbackInterval = setInterval(cereFeedback, 2500);
+}
+
+function opresteCamera() {
+    var feed = document.getElementById('camera-feed');
+    var placeholder = document.getElementById('placeholder');
+    var container = document.getElementById('feedContainer');
+    var overlay = document.getElementById('cameraOverlay');
+    var btn = document.getElementById('btnCamera');
+    var btnText = document.getElementById('btnText');
+    var dot = document.getElementById('statusDot');
+    var statusText = document.getElementById('statusText');
+
+    feed.src = '';
+    feed.classList.remove('activa');
+    placeholder.classList.remove('ascuns');
+    container.classList.remove('activa');
+    overlay.classList.remove('activa');
+
+    btn.classList.remove('oprit');
+    btnText.textContent = 'Porneste Camera';
+    btn.querySelector('span:first-child').innerHTML = '&#9654;';
+
+    dot.classList.add('oprit');
+    statusText.textContent = 'OPRITA';
+
+    cameraActiva = false;
+
+    if (feedbackInterval) {
+        clearInterval(feedbackInterval);
+        feedbackInterval = null;
+    }
+
+    resetArticulatii();
+}
+
+function cereFeedback() {
+    if (!cameraActiva) return;
+
+    fetch('/feedback/' + dansSelectat)
+        .then(function(r) { return r.json(); })
+        .then(function(data) { afiseazaFeedback(data); })
+        .catch(function() {});
+}
+
+function afiseazaFeedback(data) {
+    var culori = {
+        'succes':     '#4CAF50',
+        'bine':       '#c9a84c',
+        'atentie':    '#FF9800',
+        'incurajare': '#2196F3',
+        'info':       'rgba(245,240,232,0.4)'
+    };
+
+    var culoare = culori[data.tip] || culori['info'];
+
+    var principal = document.getElementById('feedbackPrincipal');
+    principal.style.color = culoare;
+    principal.textContent = data.mesaj;
+
+    var detalii = document.getElementById('feedbackDetalii');
+    detalii.innerHTML = '';
+    if (data.detalii && data.detalii.length > 0) {
+        data.detalii.forEach(function(d) {
+            var div = document.createElement('div');
+            div.className = 'feedback-detaliu';
+            div.innerHTML = '<span style="color:' + culoare +
+                '">&#9654;</span> ' + d;
+            detalii.appendChild(div);
+        });
+    }
+
+    var bara = document.getElementById('feedbackBara');
+    bara.style.width = (data.scor || 0) + '%';
+    bara.style.background = culoare;
+
+    if (data.analiza) {
+        var a = data.analiza;
+
+        var genSt = document.getElementById('genStang');
+        genSt.textContent = (a.unghi_gen_stang || '---') + (a.unghi_gen_stang ? '°' : '');
+        genSt.className = 'articulatie-valoare' +
+            (a.gen_stang_indoit ? ' bun' : ' atentie');
+
+        var genDr = document.getElementById('genDrept');
+        genDr.textContent = (a.unghi_gen_drept || '---') + (a.unghi_gen_drept ? '°' : '');
+        genDr.className = 'articulatie-valoare' +
+            (a.gen_drept_indoit ? ' bun' : ' atentie');
+
+        var picior = document.getElementById('piciorFata');
+        picior.textContent = a.picior_in_fata ?
+            (a.picior_in_fata === 'stang' ? 'Stang' : 'Drept') : 'Neutru';
+        picior.className = 'articulatie-valoare' +
+            (a.picior_in_fata ? ' bun' : '');
+
+        var greutate = document.getElementById('greutate');
+        var greutateText = {
+            'stanga': 'Stanga',
+            'dreapta': 'Dreapta',
+            'centru': 'Centru'
+        };
+        greutate.textContent = greutateText[a.greutate] || '---';
+        greutate.className = 'articulatie-valoare bun';
+    }
+}
+
+function resetArticulatii() {
+    ['genStang', 'genDrept', 'piciorFata', 'greutate'].forEach(function(id) {
+        var el = document.getElementById(id);
+        el.textContent = '---';
+        el.className = 'articulatie-valoare';
+    });
+}
+
+function selectDans(el, dans) {
+    document.querySelectorAll('.dans-optiune')
+            .forEach(function(d) { d.classList.remove('selectat'); });
+    el.classList.add('selectat');
+    dansSelectat = dans;
+
+    if (cameraActiva) {
+        opresteCamera();
+        setTimeout(pornesteCamera, 500);
+    }
+}
+</script>
+
+</body>
+</html>
